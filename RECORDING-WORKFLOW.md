@@ -39,6 +39,53 @@ cd "/Users/iamjohndass/Documents/John Ellison Show/E1 - The Vibe Coding Revoluti
 - [ ] Use dark theme for code editors
 - [ ] Close unnecessary apps/windows
 - [ ] 4K display if available
+- [ ] **Log into all apps BEFORE recording** (see login guide below)
+- [ ] Prepare demo data/content in apps
+- [ ] Hide/blur any personal info (emails, names, etc.)
+
+## Handling Authentication
+
+### Before Recording:
+
+**1. Log in to all apps first**
+- Don't record the login process (shows email/password)
+- Have all apps open and authenticated
+- Stay logged in during all recordings
+
+**2. Use appropriate accounts:**
+- Demo accounts if available
+- Personal accounts are fine (we'll only show the dashboard/features)
+- Make sure account has good demo data
+
+**3. What to show:**
+- ✅ Dashboard/main interface (already logged in)
+- ✅ Features and functionality
+- ✅ Navigation between sections
+- ✅ Results/outputs
+
+**4. What to hide/avoid:**
+- ❌ Login screens with email/password
+- ❌ Account settings pages
+- ❌ Billing/payment info
+- ❌ Personal identifying information
+- ❌ API keys or sensitive data
+
+### Recording Flow for Authenticated Apps:
+
+```
+1. Open browser
+2. Navigate to app URL
+3. Log in (do NOT record this part)
+4. Prepare the view you want to show
+5. NOW start Cmd+Shift+5 screen recording
+6. Navigate through features naturally
+7. Stop recording
+```
+
+**Pro Tip:** If you need to show the URL, you can:
+- Start recording already on the main dashboard
+- Or briefly show the URL bar, then continue to features
+- The viewer doesn't need to see you log in
 
 ## Recording Tips
 
