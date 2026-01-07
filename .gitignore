@@ -1,0 +1,60 @@
+# Environment and secrets
+.env
+.env.local
+*.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Video files (too large for git)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# Image files (can be large)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+
+# Processed output folders
+processed_1080p/
+4K/
+_original/
+webp/
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*_temp.mp4
+*_1080p_temp.mp4
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude
+.claude/
