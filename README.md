@@ -32,6 +32,18 @@ cd ~/Desktop
 ./watch_screenshots.sh &
 ```
 
+### Screen Recording (App Demos)
+
+```bash
+# Interactive recording helper with menu
+./record_helper.sh
+
+# Or use Python script for advanced automation
+python screen_recorder.py --list              # List available demos
+python screen_recorder.py --demo pravos       # Record Pravos demo
+python screen_recorder.py --record-only 60    # Simple 60s recording
+```
+
 ## 📦 Scripts
 
 ### Video Processing
@@ -40,9 +52,14 @@ cd ~/Desktop
 - **`upscale_to_4k.py`** - 4K upscaling via Fal.ai
 - **`auto_process_videos.sh`** - Watch folder for new videos
 
+### Screen Recording
+- **`record_helper.sh`** - Interactive menu for recording app demos
+- **`screen_recorder.py`** - Advanced screen recording automation
+
+### AI Video Generation
+- **`veo_generator.py`** - Generate AI videos with Google Veo 3.1
+
 ### Utilities
-- **`screen_recorder.py`** - Screen recording utility
-- **`veo_generator.py`** - Video generation helper
 - **`convert_screenshots_to_webp.sh`** - Screenshot optimizer (on Desktop)
 - **`watch_screenshots.sh`** - Auto-watch for new screenshots (on Desktop)
 
@@ -75,17 +92,25 @@ FAL_API_KEY=your-api-key-here
 ## 📊 Results
 
 ### Video Processing
-- **33 videos** upscaled to 4K (3840x2160)
+- **35 videos** upscaled to 4K (3840x2160)
 - ~4 minutes per video
 - Automatic organization into `4K/` and `_original/` folders
+- Total: 4.8GB of 4K footage
 
 ### Screenshot Conversion
 - **1,533 screenshots** converted to WebP
 - **60-96% file size reduction**
 - Original quality maintained
 
+### Screen Recordings
+- Apps to record: Pravos, Vibrana.ai, Mrktr
+- Dev footage: Claude Code, VS Code/Cursor
+- B-roll: Coding, terminal, git operations
+
 ## 📖 Documentation
 
+- **`RECORDING-WORKFLOW.md`** - Screen recording workflow & tips
+- **`SCREEN-RECORDING-SHOT-LIST.md`** - Shot list for app demos
 - **`VIDEO_WORKFLOW.md`** - Complete video processing guide
 - **`E1-PRODUCTION-GUIDE.md`** - Episode 1 production guide
 - **`SCRIPT-WITH-BROLL.md`** - Episode script with B-roll notes
