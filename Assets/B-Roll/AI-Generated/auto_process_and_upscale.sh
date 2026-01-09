@@ -21,14 +21,15 @@ process_video() {
     local TEMP_1080P="${WATCH_DIR}/${FILENAME}_1080p_temp.mp4"
     local FINAL_4K="${FOUR_K_DIR}/${FILENAME}_4K.mp4"
 
-    # Skip if already processed (4K version exists)
-    if [ -f "$FINAL_4K" ]; then
-        log "⏭️  Skipping (already in 4K): $FILENAME"
+    # Skip if it's already a processed file
+    if [[ "$FILENAME" =~ _1080p_temp$ ]] || [[ "$FILENAME" =~ _4K$ ]] || [[ "$FILENAME" =~ _1080p$ ]]; then
         return 0
     fi
 
-    # Skip if it's already a processed file
-    if [[ "$FILENAME" =~ _1080p_temp$ ]] || [[ "$FILENAME" =~ _4K$ ]]; then
+    # Skip if ANY 4K version already exists (check all naming patterns)
+    local EXISTING_4K=$(find "$FOUR_K_DIR" -maxdepth 1 -name "${FILENAME}*4K*.mp4" -o -name "${FILENAME}*4k*.mp4" 2>/dev/null | head -1)
+    if [ -n "$EXISTING_4K" ]; then
+        log "⏭️  Skipping (already in 4K): $FILENAME -> $(basename "$EXISTING_4K")"
         return 0
     fi
 
