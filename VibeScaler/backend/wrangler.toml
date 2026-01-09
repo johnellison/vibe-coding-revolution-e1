@@ -1,0 +1,16 @@
+name = "vibescaler-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+ENVIRONMENT = "development"
+
+# Secrets (set via wrangler secret put):
+# FAL_API_KEY - Your fal.ai API key
+# SUPABASE_URL - Your Supabase project URL
+# SUPABASE_ANON_KEY - Your Supabase anon key
+# APPLE_TEAM_ID - Your Apple Developer Team ID
+
+[env.production]
+name = "vibescaler-api"
+vars = { ENVIRONMENT = "production" }
