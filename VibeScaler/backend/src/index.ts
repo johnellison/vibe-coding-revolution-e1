@@ -58,6 +58,10 @@ export default {
         return handleVerifyPurchase(request, env);
       }
 
+      if (path === '/api/remove-background') {
+        return handleRemoveBackground(request, env);
+      }
+
       // Health check
       if (path === '/health') {
         return json({ status: 'ok', environment: env.ENVIRONMENT });
@@ -269,6 +273,131 @@ async function handleGetStatus(jobId: string, env: Env): Promise<Response> {
     resultUrl: status.response?.image?.url,
     error: status.error,
   });
+}
+
+// ============================================================
+// BACKGROUND REMOVAL HANDLERS
+// ============================================================
+
+interface RemoveBackgroundRequest {
+  image: string; // base64 data URL
+  model: 'portrait' | 'general' | 'heavy' | 'bria';
+}
+
+// Model configurations for background removal
+const BG_REMOVAL_MODELS = {
+  portrait: {
+    endpoint: 'fal-ai/birefnet',
+    modelType: 'Portrait',
+  },
+  general: {
+    endpoint: 'fal-ai/birefnet',
+    modelType: 'General Use (Light)',
+  },
+  heavy: {
+    endpoint: 'fal-ai/birefnet',
+    modelType: 'General Use (Heavy)',
+  },
+  bria: {
+    endpoint: 'fal-ai/bria/background/remove',
+    modelType: null,
+  },
+};
+
+async function handleRemoveBackground(request: Request, env: Env): Promise<Response> {
+  const userId = await validateAuth(request);
+  if (!userId) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
+  // Check credits
+  const { data: user } = await supabase
+    .from('users')
+    .select('image_credits')
+    .eq('id', userId)
+    .single();
+
+  if (!user || user.image_credits < 1) {
+    return json({ error: 'Insufficient credits' }, 402);
+  }
+
+  // Deduct credit
+  await supabase
+    .from('users')
+    .update({ image_credits: user.image_credits - 1 })
+    .eq('id', userId);
+
+  const body: RemoveBackgroundRequest = await request.json();
+  const modelConfig = BG_REMOVAL_MODELS[body.model] || BG_REMOVAL_MODELS.portrait;
+
+  try {
+    // Build request body
+    const falBody: Record<string, unknown> = {
+      image_url: body.image,
+    };
+
+    // Add model type if applicable (BiRefNet)
+    if (modelConfig.modelType) {
+      falBody.model = modelConfig.modelType;
+    }
+
+    // Call fal.ai
+    const falResponse = await fetch(`https://queue.fal.run/${modelConfig.endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${env.FAL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(falBody),
+    });
+
+    const falResult = await falResponse.json() as Record<string, unknown>;
+
+    if (!falResponse.ok) {
+      // Refund credit on failure
+      await supabase
+        .from('users')
+        .update({ image_credits: user.image_credits })
+        .eq('id', userId);
+
+      return json({ error: 'Processing failed', details: falResult }, 500);
+    }
+
+    // Log transaction
+    await supabase.from('transactions').insert({
+      user_id: userId,
+      type: 'background_removal',
+      credits_used: 1,
+      model: body.model,
+    });
+
+    // Extract result URL (handle different response structures)
+    let resultUrl: string | null = null;
+    if (falResult.image && typeof falResult.image === 'object' && 'url' in (falResult.image as object)) {
+      resultUrl = (falResult.image as { url: string }).url;
+    } else if (falResult.output && typeof falResult.output === 'object' && 'url' in (falResult.output as object)) {
+      resultUrl = (falResult.output as { url: string }).url;
+    } else if (typeof falResult.output === 'string') {
+      resultUrl = falResult.output;
+    } else if (typeof falResult.url === 'string') {
+      resultUrl = falResult.url;
+    }
+
+    return json({
+      status: 'completed',
+      resultUrl,
+    });
+  } catch (error) {
+    // Refund credit on error
+    await supabase
+      .from('users')
+      .update({ image_credits: user.image_credits })
+      .eq('id', userId);
+
+    throw error;
+  }
 }
 
 // ============================================================

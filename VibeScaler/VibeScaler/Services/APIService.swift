@@ -126,6 +126,61 @@ class APIService {
         throw APIError.timeout
     }
 
+    // MARK: - Remove Background
+
+    func removeBackground(
+        inputURL: URL,
+        model: BackgroundRemovalModel,
+        progress: @escaping (Double) -> Void
+    ) async throws -> URL {
+        guard let token = sessionToken else {
+            throw APIError.unauthorized
+        }
+
+        // Read image data
+        let imageData = try Data(contentsOf: inputURL)
+        let base64Image = imageData.base64EncodedString()
+
+        // Build request
+        let url = URL(string: "\(baseURL)/api/remove-background")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "image": "data:image/\(inputURL.pathExtension);base64,\(base64Image)",
+            "model": model.rawValue
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        progress(0.3)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            let result = try JSONDecoder().decode(RemoveBackgroundResponse.self, from: data)
+            guard let resultURL = result.resultUrl else {
+                throw APIError.noResult
+            }
+            progress(0.9)
+            return URL(string: resultURL)!
+        case 401:
+            throw APIError.unauthorized
+        case 402:
+            throw APIError.insufficientCredits
+        case 429:
+            throw APIError.rateLimited
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+    }
+
     // MARK: - Get Credits
 
     func getCredits() async throws -> (imageCredits: Int, videoSeconds: Int) {
@@ -165,6 +220,12 @@ struct JobStatusResponse: Codable {
 struct CreditsResponse: Codable {
     let imageCredits: Int
     let videoSeconds: Int
+}
+
+struct RemoveBackgroundResponse: Codable {
+    let status: String
+    let resultUrl: String?
+    let error: String?
 }
 
 // MARK: - API Errors

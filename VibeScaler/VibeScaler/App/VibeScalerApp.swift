@@ -56,6 +56,7 @@ class AppState: ObservableObject {
 
     enum NavigationItem: String, CaseIterable {
         case upscale = "Upscale"
+        case removeBackground = "Remove BG"
         case history = "History"
         case store = "Store"
     }

@@ -78,6 +78,8 @@ struct ContentView: View {
                 switch appState.currentView {
                 case .upscale:
                     UpscaleView()
+                case .removeBackground:
+                    RemoveBackgroundView()
                 case .history:
                     HistoryView()
                 case .store:
@@ -103,6 +105,7 @@ struct ContentView: View {
     private func iconForItem(_ item: AppState.NavigationItem) -> String {
         switch item {
         case .upscale: return "arrow.up.left.and.arrow.down.right"
+        case .removeBackground: return "person.crop.rectangle.stack"
         case .history: return "clock.arrow.circlepath"
         case .store: return "creditcard"
         }
